@@ -134,8 +134,8 @@
             foreach($dataSet as $dataElement){
                 $dataObject = new stdClass();
                 
-                $dataObject->episode_id = $dataElement->episode_id;
-                $dataObject->title = $dataElement->title;
+                $dataObject->episode = $dataElement->episode_id;
+                $dataObject->name = $dataElement->title;
                 $dataObject->director = $dataElement->director;
                 $dataObject->producer = $dataElement->producer;
                 $dataObject->release_date = $dataElement->release_date;
