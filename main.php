@@ -8,7 +8,7 @@
         public function __construct(){
             $this->initVariables();
             $this->buildDataBase();
-            //$print_r()
+            $this->outPutJson();
         }
         
         //initializes the local variables
@@ -28,21 +28,150 @@
         
         }
         
+        //outputs the json file
+        protected function outPutJson(){
+            
+            file_put_contents($this->outputFileName,json_encode($this->databaseData));
+    
+    file_put_contents($file,$data);
+
+        }
+        
         protected function buildDataBase(){
             //local variables
             $planets = null;   //holds the planets
             $dataSet = [];     //holds the current dataSet retireved from the getData function
 
             //build planet's data set
-            array_push($this->databaseData,$this->getPlanets());
-            $planets = $this->databaseData[0];
+            $this->databaseData = $this->extractArray($this->databaseData,$this->getPlanets());
+            $planets = $this->databaseData;
             
             //build person's dataSet
-            array_push($this->databaseData,$this->getPerson($planets));
+            $this->databaseData = $this->extractArray($this->databaseData,$this->getPerson($planets));
             
+            //build the species's dataSet
+            $this->databaseData = $this->extractArray($this->databaseData,$this->getSpecies($planets));
+            
+            //build the species's dataSet
+            $this->databaseData = $this->extractArray($this->databaseData,$this->getFilms($planets));
+            
+            //build the vehicle's dataSet
+            $this->databaseData = $this->extractArray($this->databaseData,$this->getVehicles($planets));
+            
+            //build the starShip's dataSet
+            $this->databaseData = $this->extractArray($this->databaseData,$this->getStarShips($planets));
             
             print_r(json_encode($this->databaseData));
             
+        }
+        
+        //builds and returns the starShip's dataSet
+        protected function getStarShips($planets){
+            //local variables
+            $dataSet = [];     //holds the current dataSet retireved from the getData function
+            $dataSetToReturn = [];
+
+            //add planets dataset
+            $dataSet = $this->getData($this->urls['vehicles'],$planets);
+            $planets = $dataSet;
+            
+            //build planets
+            foreach($dataSet as $dataElement){
+                $dataObject = new stdClass();
+                
+                $dataObject->name = $dataElement->name;
+                $dataObject->model = $dataElement->model;
+                $dataObject->cost_in_credits = $dataElement->cost_in_credits;
+                $dataObject->length = $dataElement->length;
+                $dataObject->crew = $dataElement->crew;
+                $dataObject->starship_class = $dataElement->starship_class;
+                
+                array_push($dataSetToReturn, $dataObject);
+            }
+            
+            return $dataSetToReturn;
+        }
+        
+        //builds and returns the vehicles's dataSet
+        protected function getVehicles($planets){
+            //local variables
+            $dataSet = [];     //holds the current dataSet retireved from the getData function
+            $dataSetToReturn = [];
+
+            //add planets dataset
+            $dataSet = $this->getData($this->urls['vehicles'],$planets);
+            $planets = $dataSet;
+            
+            //build planets
+            foreach($dataSet as $dataElement){
+                $dataObject = new stdClass();
+                
+                $dataObject->name = $dataElement->name;
+                $dataObject->model = $dataElement->model;
+                $dataObject->manufacturer = $dataElement->manufacturer;
+                $dataObject->length = $dataElement->length;
+                $dataObject->crew = $dataElement->crew;
+                $dataObject->cost_in_credits = $dataElement->cost_in_credits;
+                $dataObject->vehicle_class = $dataElement->vehicle_class;
+                
+                array_push($dataSetToReturn, $dataObject);
+            }
+            
+            return $dataSetToReturn;
+        }
+        
+        //builds and returns the film's dataSet
+        protected function getFilms($planets){
+            //local variables
+            $dataSet = [];     //holds the current dataSet retireved from the getData function
+            $dataSetToReturn = [];
+
+            //add planets dataset
+            $dataSet = $this->getData($this->urls['films'],$planets);
+            $planets = $dataSet;
+            
+            //build planets
+            foreach($dataSet as $dataElement){
+                $dataObject = new stdClass();
+                
+                $dataObject->episode_id = $dataElement->episode_id;
+                $dataObject->title = $dataElement->title;
+                $dataObject->director = $dataElement->director;
+                $dataObject->producer = $dataElement->producer;
+                $dataObject->release_date = $dataElement->release_date;
+                
+                array_push($dataSetToReturn, $dataObject);
+            }
+            
+            return $dataSetToReturn;
+        }
+        
+        //builds and returns the specie's dataSet
+        protected function getSpecies($planets){
+            //local variables
+            $dataSet = [];     //holds the current dataSet retireved from the getData function
+            $dataSetToReturn = [];
+
+            //add planets dataset
+            $dataSet = $this->getData($this->urls['species'],$planets);
+            $planets = $dataSet;
+            
+            //build planets
+            foreach($dataSet as $dataElement){
+                $dataObject = new stdClass();
+                
+                $dataObject->name = $dataElement->name;
+                $dataObject->language = $dataElement->language;
+                $dataObject->homeworld = $dataElement->homeworld;
+                $dataObject->average_lifespan = $dataElement->average_lifespan;
+                $dataObject->average_height = $dataElement->average_height;
+                $dataObject->classification = $dataElement->classification;
+                $dataObject->designation = $dataElement->designation;
+                
+                array_push($dataSetToReturn, $dataObject);
+            }
+            
+            return $dataSetToReturn;
         }
         
         //builds and returns the planets dataSet
@@ -126,6 +255,16 @@
 
             //return the data
             return $mergedArray;
+        }
+        
+        //extracts the data from the second argument array and places it as individual data in the first argument
+        protected function extractArray($mainArray,$extractArray){
+            
+            foreach($extractArray as $element){
+                array_push($mainArray,$element);
+            }
+            
+            return $mainArray;
         }
         
         //checks the input for a homeworld, and sets the correct homeworld if exists
