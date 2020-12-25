@@ -52,7 +52,7 @@
             //build the species's dataSet
             $this->databaseData = $this->extractArray($this->databaseData,$this->getSpecies($planets));
             
-            //build the species's dataSet
+            //build the film's dataSet
             $this->databaseData = $this->extractArray($this->databaseData,$this->getFilms($planets));
             
             //build the vehicle's dataSet
@@ -72,7 +72,7 @@
             $dataSetToReturn = [];
 
             //add planets dataset
-            $dataSet = $this->getData($this->urls['vehicles'],$planets);
+            $dataSet = $this->getData($this->urls['starShips'],$planets);
             $planets = $dataSet;
             
             //build planets
